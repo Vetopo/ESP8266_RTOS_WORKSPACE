@@ -18,6 +18,7 @@ typedef enum{
 }_ATC_TASK_EVENT;
 
 uint8 ATC_TaskInit(uint8 dev_type);
+
 void ATC_ReqSendLqi(uint8 *rec_mac, uint8 rec_rssi);
 void  ATC_ReceiveMessageCB(uint8 type,uint8 cmd0, uint8 cmd1, uint8 *pdata, int len);
 

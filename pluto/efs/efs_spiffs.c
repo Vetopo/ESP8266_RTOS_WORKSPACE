@@ -24,9 +24,9 @@
 const 	char	*basic_dir="/spiffs";
 static 	char	path_buf[EFS_NAME_MAX_LENGTH];
 static 	void  	init_file_system(void);
-static char 	*gen_file_name(char *file);
+static char 	*gen_file_name(const char *file);
 
-char *efs_read_text(char *fname)
+char *efs_read_text(const char *fname)
 {
 	char *pstr;
 	int len;
@@ -48,12 +48,12 @@ char *efs_read_text(char *fname)
 	}
 	return NULL;
 }
-int efs_write_text(char *fname, char *str)
+int efs_write_text(const char *fname, char *str)
 {
 	int len = eloop_strlen(str);
 	return efs_write_file(fname,0,(u_int8*)str,len);
 }
-int efs_read_file(char *fname, int offset, u_int8 *buf,  int len)
+int efs_read_file(const char *fname, int offset, u_int8 *buf,  int len)
 {
 	char	*path;
 	FILE	*pfile;
@@ -80,7 +80,7 @@ int efs_read_file(char *fname, int offset, u_int8 *buf,  int len)
 	}
 	return slen;
 }
-int  efs_write_file(char *fname, int offset, u_int8 *pdata, int len)
+int  efs_write_file(const char *fname, int offset, u_int8 *pdata, int len)
 {
 	char	*path;
 	FILE 	*pfile;
@@ -111,7 +111,7 @@ int  efs_write_file(char *fname, int offset, u_int8 *pdata, int len)
 	}
 	return slen;
 }
-int  efs_get_file_length(char *fname)
+int  efs_get_file_length(const char *fname)
 {
 	char	*path;
 	struct 	stat  Stat;
@@ -135,7 +135,7 @@ int  efs_get_file_length(char *fname)
 	}
 	return slen;
 }
-char *efs_get_file_name(char *filter, int id)
+char *efs_get_file_name(const char *filter, int id)
 {
 	char	*path;
 	char	*fname = NULL;
@@ -214,7 +214,7 @@ char *efs_get_file_name(char *filter, int id)
 	}
 	return fname;
 }
-int efs_delete_file(char *fname)
+int efs_delete_file(const char *fname)
 {
 	char	*path;
 	init_file_system();
@@ -270,7 +270,7 @@ int efs_disk_format(void)
 	efs_delete_all_file();
 	return ES_SUCCEED;
 }
-int	efs_rename(char *old_name,char *new_name)
+int	efs_rename(const char *old_name,const char *new_name)
 {
 	char 	*path;
 	char	path_old[EFS_NAME_MAX_LENGTH];
@@ -321,14 +321,14 @@ static void init_file_system(void)
 		init_flag = ES_TRUE;
 	}
 }
-static char *gen_file_name(char *file)
+static char *gen_file_name(const char *file)
 {
 	if((eloop_strlen(basic_dir)+eloop_strlen(file)+1)<EFS_NAME_MAX_LENGTH)
 	{
 		eloop_strcpy(path_buf,basic_dir);
 		eloop_strcat(path_buf,"/");
 		if(file!=NULL)
-			{eloop_strcat(path_buf,file);}
+			{eloop_strcat(path_buf,(void*)file);}
 		return path_buf;
 	}
 	else

@@ -1,5 +1,5 @@
-#ifndef __APS_H__
-#define __APS_H__
+#ifndef __PLUTO_APS_H__
+#define __PLUTO_APS_H__
 
 #include "eloop.h"
 
@@ -100,6 +100,12 @@ typedef void (*aps_recieve_mcmd_t)(Address_t *src,uint8 seq, MixCommand_t *cmd,u
 typedef void (*aps_send_cmd_cb_t)(Address_t *dst,uint8 seq, Command_t *cmd, uint8 state);
 typedef void (*aps_send_mcmd_t)(Address_t *dst,uint8 seq, MixCommand_t *cmd, uint8 state);
 
+typedef void    (*read_file_cb_t)(uint8 *src,uint8 state, char *file_name, uint8 *pdata, uint32 len);
+typedef void    (*write_file_cb_t)(uint8 *src, uint8 state, char *file_name);
+typedef void    (*read_name_cb_t)(uint8 *src, uint8 state, char *file_name);
+typedef void    (*rename_file_cb_t)(uint8 *src, uint8 state, char *file_name);
+typedef void    (*delete_file_cb_t)(uint8 *src, uint8 state, char *file_name);
+
 typedef struct
 {
 	aps_recieve_mcmd_t		recieve_mcmd_cb;
@@ -107,6 +113,15 @@ typedef struct
 	aps_send_cmd_cb_t		send_cmd_cb;
 	aps_send_mcmd_t			send_mcmd_cb;
 }ApsCmdListener_t;
+
+typedef struct
+{
+	read_file_cb_t 		read_file_cb;
+	read_name_cb_t		read_name_cb;
+	write_file_cb_t		write_file_cb;
+	rename_file_cb_t	rename_file_cb;
+	delete_file_cb_t	delete_file_cb;
+}ApsFsListener_t;
 
 void 	aps_set_cmd_listener(ApsCmdListener_t *listener);
 
@@ -116,7 +131,40 @@ sint8	aps_req_report(uint8 port, uint8 seq,Command_t *cmd,uint8 *pdata, uint32 l
 sint8 	aps_req_report_state(uint8 port,uint8 seq,Command_t* cmd,uint8 state, uint8 *pdata, uint32 len,uint8 send_option);
 sint8  	aps_mcmd_req_send(Address_t *dst,uint8 seq,MixCommand_t* cmd, int cmd_num,uint8 send_option);
 sint8  	aps_mcmd_req_report(uint8 port, uint8 seq,MixCommand_t* cmd, int cmd_num ,uint8 send_option);
+
+void 	aps_set_fs_listener(ApsFsListener_t *listener);
+sint8 	aps_req_write_file(Address_t *dst,uint8 seq,char *name, uint8 *pdata, int len);
+sint8 	aps_req_rename_file(Address_t *dst,uint8 seq,char *name,char *new_name);
+sint8 	aps_req_read_file(Address_t *dst,uint8 seq,char *name);
+sint8 	aps_req_read_name(Address_t *dst,uint8 seq,char *name);
+sint8 	aps_req_delete_file(Address_t *dst,uint8 seq,char *name);
+
 uint16 	aps_get_seq(void);
+
+sint8 	aps_add_device_key(uint8 *addr,uint8 keyID,uint8 *key);
+uint8*	aps_get_device_key(uint8 *addr, uint8 keyID);
+sint8 	aps_remove_device_keys(void);
+sint8 	aps_remove_device_key(uint8 *addr);
+sint8 	aps_remove_key(uint8 *addr,uint8 keyID);
+
+sint8 	aps_register_port(uint8 port_num,uint32 applicationID, uint32 *attr_list, uint8 attr_num, uint8 force);
+uint8  	aps_read_port_num(void);
+uint8*  aps_read_port_list(void);
+uint8 	aps_get_free_port(void);
+uint8 	aps_port_is_exist(uint8 port);
+char* 	aps_read_port_describe(uint8 port);
+sint8  	aps_update_port_describe(char *describe);
+sint8 	aps_delete_port(uint8 port_num);
+
+sint8 	aps_port_set_value(uint8 port,char *obj, int value);
+sint8 	aps_port_set_string(uint8 port, char *obj, char *str);
+uint32 	aps_port_get_value(uint8 port, char *obj);
+char* 	aps_port_get_string(uint8 port, char *obj);
+uint8 	aps_count_port_by_value(char *obj,int value);
+uint8 	aps_count_port_by_string(char *obj,char *str);
+uint8 	aps_get_port_by_value_index(char *obj,int value, uint8 index);
+uint8 	aps_get_port_by_string_index(char *obj,char *str, uint8 index);
+uint8	aps_get_port_by_value2(char *obj1,int value1, char *obj2, int value2);
 
 #endif
 

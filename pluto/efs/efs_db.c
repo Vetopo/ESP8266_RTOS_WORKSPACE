@@ -22,15 +22,15 @@ typedef struct
 static efs_db_t	efs_db;
 static char temp_fname[EFS_NAME_MAX_LENGTH+1];
 
-static int _db_safe_open(char *db);
+static int _db_safe_open(const char *db);
 static int _db_flush_data(void);
-static int _db_safe_load(char *db);
-static int _db_load_database(char *db);
+static int _db_safe_load(const char *db);
+static int _db_load_database(const char *db);
 static void _db_delay_update(void);
 static void _db_timer(u_int8 sig);
-static char *_db_gen_temp_file_name(char *fname);
+static char *_db_gen_temp_file_name(const char *fname);
 
-int efs_db_save_string(char *db, char *key, char *value)
+int efs_db_save_string(const char *db, char *key, char *value)
 {
 	int ret = ES_FAILED;
 	eloop_log(DBG_EFS,"efs_db_save_string\r\n");
@@ -43,7 +43,7 @@ int efs_db_save_string(char *db, char *key, char *value)
 	}
 	return ret;
 }
-int efs_db_save_block(char *db, char *key, void *block, int block_size)
+int efs_db_save_block(const char *db, char *key, void *block, int block_size)
 {
 	int ret = ES_FAILED;
 	char *pbuf;
@@ -57,7 +57,7 @@ int efs_db_save_block(char *db, char *key, void *block, int block_size)
 	}
 	return ret;
 }
-int efs_db_save_number(char *db, char *key, u_int32 value)
+int efs_db_save_number(const char *db, char *key, u_int32 value)
 {
 	int ret = ES_FAILED;
 	eloop_log(DBG_EFS,"efs_db_save_number\r\n");
@@ -70,7 +70,7 @@ int efs_db_save_number(char *db, char *key, u_int32 value)
 	}
 	return ret;
 }
-char *efs_db_read_string(char *db, char *key)
+char *efs_db_read_string(const char *db, char *key)
 {
 	cJSON *item;
 	eloop_log(DBG_EFS,"efs_db_read_string\r\n");
@@ -87,7 +87,7 @@ char *efs_db_read_string(char *db, char *key)
 	}
 	return NULL;
 }
-int efs_db_read_block(char *db, char *key, void *block, int block_size)
+int efs_db_read_block(const char *db, char *key, void *block, int block_size)
 {
 	char *str;
 	int slen = 0;
@@ -102,7 +102,7 @@ int efs_db_read_block(char *db, char *key, void *block, int block_size)
 	}
 	return slen;
 }
-u_int32 efs_db_read_number(char *db,char *key)
+u_int32 efs_db_read_number(const char *db,char *key)
 {
 	cJSON *item;
 	eloop_log(DBG_EFS,"efs_db_read_number\r\n");
@@ -119,7 +119,7 @@ u_int32 efs_db_read_number(char *db,char *key)
 	}
 	return 0;
 }
-int efs_db_count_element(char *db)
+int efs_db_count_element(const char *db)
 {
 	cJSON *item;
 	int count = 0;
@@ -135,7 +135,7 @@ int efs_db_count_element(char *db)
 	}
 	return count;
 }
-char *efs_db_get_key(char *db, int id)
+char *efs_db_get_key(const char *db, int id)
 {
 	cJSON *item;
 	int count = 0;
@@ -155,7 +155,7 @@ char *efs_db_get_key(char *db, int id)
 	}
 	return NULL;
 }
-int efs_db_delete_value(char *db, char *key)
+int efs_db_delete_value(const char *db, char *key)
 {
 	int ret = ES_FAILED;
 	eloop_log(DBG_EFS,"efs_db_delete_value\r\n");
@@ -172,13 +172,13 @@ int efs_db_flush(void)
 	eloop_log(DBG_EFS,"efs_db_flush\r\n");
 	return _db_flush_data();
 }
-static char *_db_gen_temp_file_name(char *fname)
+static char *_db_gen_temp_file_name(const char *fname)
 {
 	temp_fname[0] = '~';
 	eloop_strcpy(&temp_fname[1],fname);
 	return temp_fname;
 }
-static int _db_safe_open(char *db)
+static int _db_safe_open(const char *db)
 {
 	int ret = ES_SUCCEED;
 	eloop_log(DBG_EFS,"_db_safe_open\r\n");
@@ -215,7 +215,7 @@ static int _db_flush_data(void)
 	}
 	return ret;
 }
-static int _db_safe_load(char *db)
+static int _db_safe_load(const char *db)
 {
 	int	ret = ES_FAILED;
 	if((ret = _db_load_database(db))==ES_FAILED)
@@ -240,7 +240,7 @@ static int _db_safe_load(char *db)
 	}
 	return ret;
 }
-static int _db_load_database(char *db)
+static int _db_load_database(const char *db)
 {
 	char 	*str;
 	int 	slen,dlen;

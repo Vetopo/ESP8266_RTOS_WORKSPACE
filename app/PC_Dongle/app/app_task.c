@@ -18,9 +18,7 @@
 #include "esp_smartconfig.h"
 
 #include "eloop.h"
-#include "pluto_stack_config.h"
 #include "pluto.h"
-#include "pluto_entry.h"
 #include "pluto_adapter.h"
 #include "ATC_Task.h"
 void app_task_init(void)

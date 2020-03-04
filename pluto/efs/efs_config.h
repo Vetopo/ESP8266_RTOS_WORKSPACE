@@ -12,7 +12,7 @@
 
 #define     ENABLE_EFS                  1
 #define     ENABLE_EFS_SPIFFS           1
-#define     ENABLE_EFS_NVS              0
+#define     ENABLE_EFS_NVS              1
 
 #if ENABLE_EFS
 

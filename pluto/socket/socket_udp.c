@@ -8,7 +8,6 @@
 #include "eloop.h"
 
 #include "pluto.h"
-#include "pluto_entry.h"
 #include "pluto_adapter.h"
 #include "socket_udp.h"
 #include "freertos/FreeRTOS.h"
@@ -17,13 +16,17 @@
 #include <netdb.h>
 #include <sys/socket.h>
 
+extern void nwk_socket_input(uint8 socket_type, uint32 ip, uint16 port, uint8 *pdata, uint16 len);
+
 static uint8	udp_task_init = ES_FALSE;
+static uint8	udp_connect_flag = ES_FAILED;
 static int 		udp_socket_fd = -1;
 static struct 	sockaddr_in udp_socket;
 static uint8 	*udp_buffer = NULL;//receive buffer
 static int		udp_buffer_size = 0;
 
 static void  udp_create_socket(void);
+static void udp_release_socket(void);
 void udp_socket_thread_rec(void *arg);
 struct udp_send_nwk_t
 {
@@ -36,17 +39,18 @@ struct udp_send_nwk_t
 int  udp_socket_init(uint16 port)
 {
 	eloop_log(DBG_PLT_SOCKET,"udp_socket_init: port:%d \r\n",pluto_adapter_ntohs(port));
+	udp_release_socket();
 	eloop_memset(&udp_socket,0,sizeof(struct sockaddr_in));
 	udp_socket.sin_family = AF_INET;
 	udp_socket.sin_addr.s_addr = INADDR_ANY;
 	udp_socket.sin_port = port;
+	udp_connect_flag = ES_FAILED;
 	//udp_socket.sin_len = sizeof(udp_socket);
 	if(udp_task_init==ES_FALSE)
 	{
-		xTaskCreate(udp_socket_thread_rec, "udp_socket_thread_rec", 2048, NULL, (tskIDLE_PRIORITY + 3), NULL);
+		xTaskCreate(udp_socket_thread_rec, "udp_socket_thread_rec", 2048, NULL, (tskIDLE_PRIORITY + 2), NULL);
 		udp_task_init = ES_TRUE;
 	}
-	udp_create_socket();
 	return 0;
 }
 int udp_registe_receive_buffer(uint8 *buf, int size)
@@ -57,15 +61,21 @@ int udp_registe_receive_buffer(uint8 *buf, int size)
 }
 int udp_socket_deinit(void)
 {
-	if(udp_socket_fd>0)
-	{
-		shutdown(udp_socket_fd,SHUT_RDWR);
-		close(udp_socket_fd);
-		udp_socket_fd = -1;
-	}
+	udp_release_socket();
 	udp_buffer = NULL;
 	udp_buffer_size = 0;
 	return ES_SUCCEED;
+}
+static void udp_release_socket(void)
+{
+	if(udp_socket_fd>0)
+	{
+		//shutdown(udp_socket_fd,SHUT_RDWR);
+		udp_connect_flag = ES_FAILED;
+		close(udp_socket_fd);
+		udp_socket_fd = -1;
+		eloop_sleep(100);
+	}
 }
 static void  udp_create_socket(void)
 {
@@ -85,11 +95,17 @@ static void  udp_create_socket(void)
 			setsockopt(udp_socket_fd,SOL_SOCKET,SO_BROADCAST,&so_br,sizeof(so_br));
 		eloop_log(DBG_PLT_SOCKET,"udp_socket_create_socket :create socket fd \r\n");
 		ret = bind(udp_socket_fd,(struct sockaddr *)&(udp_socket),sizeof(udp_socket));
-		if(ret==-1)
+		if(ret<0)
 		{
 			eloop_log(DBG_PLT_SOCKET,"udp_socket_create_socket bind socket_fd error \r\n");
-			udp_socket_deinit();
+			udp_release_socket();
 		}
+		else
+		{
+			udp_connect_flag = ES_SUCCEED;
+			eloop_log(DBG_PLT_SOCKET,"udp_create_socket bind socket succeed fd:%d \r\n",udp_socket_fd);
+		}
+		
 	}
 	eloop_log(DBG_PLT_SOCKET,"udp_socket_create_socket :binded socket finished\r\n");
 }
@@ -101,14 +117,15 @@ void  udp_socket_thread_rec(void *arg)
 	char *pip;
 	uint16 port;
 	int ret;
+	udp_create_socket();
 	while(1)
 	{
-		if((udp_socket_fd>=0)&&(udp_buffer!=NULL))
+		while((udp_socket_fd>=0)&&(udp_buffer!=NULL))
 		{
 			ret = recvfrom(udp_socket_fd,udp_buffer,udp_buffer_size,0,(struct sockaddr *)&fromSocket,&fromSlen);
 			if(ret>0)
 			{
-				pluto_led_blink(1,10,0);
+				af_led_blink(1,10,0);
 				port = (uint16)fromSocket.sin_port;//ntohs(fromSocket.sin_port);
 				ip = (uint32)fromSocket.sin_addr.s_addr;//ntohl(fromSocket.sin_addr);
 				pip = (char*)inet_ntoa(fromSocket.sin_addr);
@@ -118,16 +135,15 @@ void  udp_socket_thread_rec(void *arg)
 			}
 			else
 			{
+				udp_connect_flag = ES_FAILED;
 				eloop_log(DBG_PLT_ERROR,"udp_socket_thread_rec: error occur !\r\n ");
-				udp_socket_deinit();
-				udp_create_socket();
-				eloop_sleep(10);
+				break;
 			}
 		}
-		else
-		{
-			eloop_sleep(100);
-		}
+		udp_release_socket();
+		eloop_sleep(3000);
+		udp_create_socket();
+		eloop_sleep(100);
 		//eloop_log("udp_socket_thread_rec",NULL,0);
 	}
 }
@@ -141,24 +157,24 @@ int  udp_socket_send(uint32 ip, uint16 port,uint8 *pdata, uint16 len)
 	s_port = pluto_adapter_ntohs(port);
 	eloop_log(DBG_PLT_SOCKET,"udp_socket_send to :%s:%d  at timestamp: %d \r\n",s_ip,s_port,eloop_get_timestamp());
 	eloop_logb(DBG_PLT_SOCKET,NULL,pdata,len);
-	//jf_entercriticalSection();
-	if(udp_socket_fd>=0)
+	if(udp_connect_flag == ES_SUCCEED)
 	{
-		pluto_led_blink(1,10,0);
-		eloop_memset(&mysocket,0,sizeof(struct sockaddr_in));
-		mysocket.sin_family = AF_INET;
-		mysocket.sin_addr.s_addr = ip;//;
-		mysocket.sin_port = port;
-		if(sendto(udp_socket_fd,pdata,len,0,(struct sockaddr *)&mysocket,addrlen)==0)
+		if(udp_socket_fd>=0)
 		{
-			//jf_exitcriticalSection();
-			return 0;
+			af_led_blink(1,10,0);
+			eloop_memset(&mysocket,0,sizeof(struct sockaddr_in));
+			mysocket.sin_family = AF_INET;
+			mysocket.sin_addr.s_addr = ip;//;
+			mysocket.sin_port = port;
+			if(sendto(udp_socket_fd,pdata,len,0,(struct sockaddr *)&mysocket,addrlen)==0)
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			eloop_log(DBG_PLT_ERROR,"udp_socket_send: socket not open\r\n");
 		}
 	}
-	else
-	{
-		eloop_log(DBG_PLT_ERROR,"udp_socket_send: socket not open\r\n");
-	}
-	//jf_exitcriticalSection();
 	return -1;
 }

@@ -5,8 +5,8 @@
  *      Author: Administrator
  */
 
-#ifndef __APPLICATION_ID_H__
-#define __APPLICATION_ID_H__
+#ifndef __PLUTO_AP_ID_H__
+#define __PLUTO_AP_ID_H__
 
 
 /************��Ҫ�豸����*****************************/

@@ -5,9 +5,8 @@
  *      Author: lort
  */
 #include "eloop.h"
-#include "pluto_stack_config.h"
 #include "pluto.h"
-#include "attribute_id.h"
+#include "pluto_attr_id.h"
 
 uint8 attr_get_data_type(uint32 aID)
 {

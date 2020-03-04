@@ -6,7 +6,6 @@
  */
 
 #include "eloop.h"
-#include "pluto_stack_config.h"
 #include "efs_config.h"
 #include "esp_system.h"
 #include "esp_partition.h"
@@ -49,7 +48,7 @@ static s_int8 _nvs_init(void)
 		return ES_SUCCEED;
 }
 
-s_int8 efs_nvs_write(char *file, u_int8 *pdata, u_int32 len)
+s_int8 efs_nvs_write(const char *file, u_int8 *pdata, u_int32 len)
 {
 	nvs_handle 	my_handle;
 	esp_err_t 	err;
@@ -73,7 +72,7 @@ s_int8 efs_nvs_write(char *file, u_int8 *pdata, u_int32 len)
     }
     return ES_FAILED;
 }
-u_int32 efs_nvs_read(char *file, u_int8 *pdata, u_int32 len)
+u_int32 efs_nvs_read(const char *file, u_int8 *pdata, u_int32 len)
 {
 	nvs_handle 	my_handle;
 	size_t 		slen = 0;
@@ -102,7 +101,7 @@ u_int32 efs_nvs_read(char *file, u_int8 *pdata, u_int32 len)
     }
     return slen;
 }
-u_int32 efs_nvs_length(char *file)
+u_int32 efs_nvs_length(const char *file)
 {
 	nvs_handle 	my_handle;
 	size_t 		slen = 0;

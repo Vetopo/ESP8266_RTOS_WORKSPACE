@@ -3,7 +3,7 @@
 
 #include "eloop.h"
 
-sint8   efs_nvs_write_sn(char *str);
+sint8   efs_nvs_write_sn(const char *str);
 char*   efs_nvs_read_sn(void);
 
 #endif

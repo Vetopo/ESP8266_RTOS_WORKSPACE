@@ -5,10 +5,8 @@
  *      Author: Administrator
  */
 
-#ifndef AID_H_
-#define AID_H_
-
-#include "eloop.h"
+#ifndef __PLUTO_AID_H__
+#define __PLUTO_AID_H__
 
 /*******PDO Attribute ID value define as follow: ***************/
 #define Attribute_ID_ServerInfo				    0x000000 //

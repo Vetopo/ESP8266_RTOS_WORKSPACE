@@ -18,7 +18,7 @@ typedef struct
 }sn_table_t;
 
 
-sint8 efs_nvs_write_sn(char *str)
+sint8 efs_nvs_write_sn(const char *str)
 {
 	sn_table_t 	*psn;
 	uint32		dlen;

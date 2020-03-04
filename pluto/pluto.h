@@ -1,15 +1,21 @@
 /*
- * pluto_service.h
+ * pluto.h
  *
- *  Created on: 2016��8��31��
+ *  Created on: 2019.9.1
  *      Author: lort
  */
 
-#ifndef PLUTO_PLUTO_ENTRY_H_
-#define PLUTO_PLUTO_ENTRY_H_
+#ifndef __PLUTO_H__
+#define __PLUTO_H__
 
-#include "aps.h"
-#include "af.h"
+#include "pluto_config.h"
+#include "pluto_af.h"
+#include "pluto_app_id.h"
+#include "pluto_attr_id.h"
+#include "pluto_aps.h"
+#include "pluto_scene.h"
+#include "update/pluto_update.h"
+#include "ATC/ATC_Task.h"
 
 #define DBG_PLT_SN			0
 #define	DBG_PLT_SOCKET		0
@@ -20,7 +26,6 @@ typedef int     (*socket_open_t)(uint8 socket_type,uint32 service_ip, uint16 ser
 typedef int     (*socket_close_t)(uint8 socket_type);
 typedef int     (*socket_output_t)(uint8 socket_type,uint32 ip, uint16 port, uint8 *pdata, uint16 len);
 /*************led indicate callback functions**************************/
-typedef void    (*led_blink_cb_t)(int num,int htime, int ltime);
 
 typedef enum
 {
@@ -110,8 +115,6 @@ typedef struct
 
 void 	pluto_init(FirmwareInfo_t *info);
 void	pluto_deinit(void);
-void	pluto_registe_led(led_blink_cb_t cb);
-void 	pluto_led_blink(int num, int htime, int ltime);
 sint8 	pluto_write_server(PlutoServer_t *pserver);
 
 #endif /* PLUTO_PLUTO_ENTRY_H_ */

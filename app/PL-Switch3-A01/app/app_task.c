@@ -18,14 +18,7 @@
 #include "esp_smartconfig.h"
 
 #include "eloop.h"
-#include "pluto_stack_config.h"
 #include "pluto.h"
-#include "pluto_entry.h"
-#include "pluto_adapter.h"
-#include "aps.h"
-#include "af.h"
-#include "attribute_id.h"
-#include "application_id.h"
 #include "hal_led.h"
 #include "hal_lamp.h"
 #include "hal_key.h"
@@ -59,16 +52,16 @@ void app_task_init(void)
 	hal_lamp_init();
 	hal_key_init();
 	hal_led_init();
-	pluto_registe_led(hal_led_blink);
+	af_registe_led(hal_led_blink);
 	mylisten.recieve_cmd_cb = _recieve_message_cb;
 	mylisten.recieve_mcmd_cb = NULL;
 	mylisten.send_cmd_cb = NULL;
 	mylisten.send_mcmd_cb = NULL;
 	aps_set_cmd_listener(&mylisten);
-    af_set_describe((AfDescribe_t*)&af_describe);
-    af_register_port(1,Application_ID_Switch,(uint32*)port_attribute_id,PORT_ATTRIBUTE_ID_NUM,ES_FALSE);
-    af_register_port(2,Application_ID_Switch,(uint32*)port_attribute_id,PORT_ATTRIBUTE_ID_NUM,ES_FALSE);
-    af_register_port(3,Application_ID_Switch,(uint32*)port_attribute_id,PORT_ATTRIBUTE_ID_NUM,ES_FALSE);
+    af_set_device_describe((AfDescribe_t*)&af_describe);
+    aps_register_port(1,Application_ID_Switch,(uint32*)port_attribute_id,PORT_ATTRIBUTE_ID_NUM,ES_FALSE);
+    aps_register_port(2,Application_ID_Switch,(uint32*)port_attribute_id,PORT_ATTRIBUTE_ID_NUM,ES_FALSE);
+    aps_register_port(3,Application_ID_Switch,(uint32*)port_attribute_id,PORT_ATTRIBUTE_ID_NUM,ES_FALSE);
 	eloop_start_timer_task(app_task,APP_EVENT_KEYSCAN,KEY_SCAN_TICK,ES_TRUE);
 }
 
@@ -101,7 +94,6 @@ void app_task(uint32 event,void *arg,uint32 len)
 						port = 0x01;
 					break;
 				}
-				ATC_TaskInit(ATC_TYPE_AS_DEVICE);
 				if(port!=0x00)
 				{
 					state = app_read_on_off(port);
@@ -112,7 +104,7 @@ void app_task(uint32 event,void *arg,uint32 len)
 			}
 			else if(shift==KEY_SHIFT_LONG_KEEP)
 			{
-				pluto_registe_led(NULL);
+				af_registe_led(NULL);
 				hal_led_blink(4,500,500);
 				eloop_start_timer_task(app_task,APP_EVENT_REGLED,(4*1000),ES_FALSE);
 			}
@@ -132,7 +124,7 @@ void app_task(uint32 event,void *arg,uint32 len)
 	}
 	if(event&APP_EVENT_REGLED)
 	{
-		pluto_registe_led(hal_led_blink);
+		af_registe_led(hal_led_blink);
 	}
 }
 static void _recieve_message_cb(Address_t *src,uint8 seq, Command_t *cmd, uint8 *pdata,uint32 len)

@@ -1,11 +1,5 @@
 #include "eloop.h"
-#include "pluto_stack_config.h"
 #include "pluto.h"
-#include "aps.h"
-#include "af.h"
-#include "attribute_id.h"
-#include "application_id.h"
-#include "pluto_update.h"
 #include "app_data.h"
 
 const uint32 device_attribute_id[] = {

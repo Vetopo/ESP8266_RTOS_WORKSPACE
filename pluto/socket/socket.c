@@ -4,7 +4,6 @@
 #include "socket.h"
 #include "pluto.h"
 #include "pluto_adapter.h"
-#include "pluto_entry.h"
 static uint8 TCP_Buffer[SOCKET_RECEIVE_BUFFER_SIZE];
 static uint8 UDP_Buffer[SOCKET_RECEIVE_BUFFER_SIZE];
 int socket_open(uint8 socket_type,uint32 ip, uint16 port)
@@ -28,7 +27,7 @@ int socket_open(uint8 socket_type,uint32 ip, uint16 port)
 int socket_close(uint8 socket_type)
 {
     int ret = SOCKET_STATE_FAILED;
-    eloop_log(DBG_PLT_SOCKET,"socket_close\r\n");
+    eloop_log(DBG_PLT_SOCKET,"socket_close type:%d \r\n",socket_type);
     if(socket_type==SOCKET_TYPE_UDP)
     {
         if(udp_socket_deinit()==0)

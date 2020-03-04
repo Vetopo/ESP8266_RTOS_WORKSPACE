@@ -11,9 +11,9 @@
 
 #include "eloop.h"
 
-s_int8  efs_nvs_write(char *file, u_int8 *pdata, u_int32 len);
-u_int32 efs_nvs_read(char *file, u_int8 *pdata, u_int32 len);
-u_int32 efs_nvs_length(char *file);
+s_int8  efs_nvs_write(const char *file, u_int8 *pdata, u_int32 len);
+u_int32 efs_nvs_read(const char *file, u_int8 *pdata, u_int32 len);
+u_int32 efs_nvs_length(const char *file);
 
 #endif /* JIFAN_JF_FS_JF_NVS_H_ */
 

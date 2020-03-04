@@ -12,7 +12,6 @@
 #include "tcpip_adapter.h"
 #include "esp_smartconfig.h"
 #include "smartconfig_ack.h"
-#include "aps.h"
 #include "pluto.h"
 #include "hal_led.h"
 void app_set_wifi_mode(wifi_mode_t mode);

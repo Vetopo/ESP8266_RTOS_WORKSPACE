@@ -1,6 +1,5 @@
 #include "eloop.h"
 #include "pluto.h"
-#include "aps.h"
 #include "app_onoff.h"
 #include "hal_lamp.h"
 

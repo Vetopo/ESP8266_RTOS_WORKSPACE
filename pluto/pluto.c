@@ -1,26 +1,26 @@
 /*
- * pluto_service.c
+ * pluto.c
  *
  *  Created on: 2019.9.1
  *      Author: lort
  */
 
 #include "eloop.h"
-#include "pluto_stack_config.h"
-#include "socket.h"
 #include "pluto.h"
+#include "socket.h"
 #include "pluto_adapter.h"
-#include "pluto_entry.h"
-#include "NIB.h"
 #include "hal_led.h"
 #include "ATC_Task.h"
 #include "pluto_update.h"
 
-extern sint8 	pdo_write_server_info(PlutoServer_t *pserver);
 extern void    	pdo_set_pluto_info(FirmwareInfo_t *info);
+extern sint8 	pdo_write_server_info(PlutoServer_t *pserver);
+extern void 	pluto_pre_init(SocketAdapter_t *adapter);
+extern void 	pluto_pre_deinit(void);
+extern sint8 	pluto_start_server(char *ip);
+
 static void 	_start_timer(uint8 sig);
 
-static led_blink_cb_t blink_led=NULL;
 const static SocketAdapter_t Adapter={
 		.open = socket_open,
 		.close = socket_close,
@@ -36,9 +36,9 @@ void pluto_init(FirmwareInfo_t *info)
 void pluto_deinit(void)
 {
 	pluto_pre_deinit();
-	pluto_registe_led(NULL);
+	af_registe_led(NULL);
 }
-#include "pluto_update.h"
+
 static void _start_timer(uint8 sig)
 {
 	uint32 local_ip;
@@ -52,22 +52,7 @@ static void _start_timer(uint8 sig)
 		eloop_stop_timer(_start_timer,1);
 	}
 }
-
-void pluto_registe_led(led_blink_cb_t cb)
-{
-	blink_led= cb;
-}
-void pluto_led_blink(int num, int htime, int ltime)
-{
-	if(login_get_state()==LOGIN_STATE_ONLINE)
-	{
-		if(blink_led!=NULL)
-		{
-			blink_led(num,htime,ltime);
-		}
-	}
-}
-sint8 pluto_write_server(PlutoServer_t *pserver)
+sint8 	pluto_write_server(PlutoServer_t *pserver)
 {
 	return pdo_write_server_info(pserver);
 }

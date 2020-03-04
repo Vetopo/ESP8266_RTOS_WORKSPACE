@@ -8,9 +8,7 @@
 #include "eloop.h"
 #include "esp_wifi.h"
 #include "ATC_Config.h"
-#include "pluto_stack_config.h"
 #include "pluto.h"
-#include "pluto_adapter.h"
 #include "efs.h"
 #include "cJSON.h"
 #include "ATC_Uart.h"
@@ -18,9 +16,6 @@
 #include "ATC_Lqi.h"
 #include "ATC_UDP.h"
 #include "ATC_Utils.h"
-#include "af.h"
-#include "pluto_adapter.h"
-#include "pluto_update.h"
 
 static void 	_response_device_info(void);
 static void 	_response_service_info(void);
@@ -147,7 +142,7 @@ static void  _response_device_info(void)
 	cJSON 	*root;
 	uint8 	chipID[8];
 	char 	buf[64];
-	text = (char*)efs_read_text(DEVICE_DESCRIBE_FILE_NAME);
+	text = af_get_device_describe();
 	if(text!=NULL)
 	{
 		root = cJSON_Parse(text);
@@ -198,7 +193,7 @@ static void  _write_service_info(uint8 *pdata, int len)
 static void _respone_read_hardware_info(void)
 {
 	char *info;
-	info = (char*)af_read_hardware_info();
+	info = (char*)af_read_firmware_info();
 	if(info!=NULL)
 	{
 		atc_udp_send_command(ATC_RPC_CMD_SRSP|ATC_RPC_SYS_SYS,ATC_SYS_READ_HARDWARE_INFO,(uint8*)info,eloop_strlen(info));
@@ -272,7 +267,7 @@ static void _update_firmware(uint8 *pdata,int len)
 		if(ret==ES_SUCCEED)
 		{
 			pluto_update_save_wifi_conf(ssid,psw);
-			af_update_hardware_cb(&src,ip,port,url);
+			pluto_update_cb(&src,ip,port,url);
 		}
 		cJSON_Delete(root);
 	}
