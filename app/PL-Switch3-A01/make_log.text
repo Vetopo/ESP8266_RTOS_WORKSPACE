@@ -1,0 +1,9 @@
+Toolchain path: /opt/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
+Toolchain version: crosstool-ng-1.22.0-100-ge567ec7
+Compiler version: 5.2.0
+Python requirements from /home/lort/share/ESP8266_RTOS_WORKSPACE/ESP8266_RTOS_SDK/requirements.txt are satisfied.
+CC build/main/../hal_driver/hal_uart.o
+AR build/main/libmain.a
+CC build/pluto/MT/MT_Factory.o
+/home/lort/share/ESP8266_RTOS_WORKSPACE/ESP8266_RTOS_SDK/make/component_wrapper.mk:291: recipe for target 'MT/MT_Factory.o' failed
+/home/lort/share/ESP8266_RTOS_WORKSPACE/ESP8266_RTOS_SDK/make/project.mk:571: recipe for target 'component-pluto-build' failed
