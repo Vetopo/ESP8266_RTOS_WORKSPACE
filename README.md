@@ -2,6 +2,16 @@
 
 * Pluto IOT Stack For ESP8266 
 
+![image](https://github.com/vetopo/ESP8266_RTOS_WORKSPACE/blob/master/doc/img/ESP8266_EV_BOARD.png)  
+
+* if you want to buy:
+
+  https://item.taobao.com/item.htm?spm=2013.1.w4023-21495180077.16.11cd2804EUGeHC&id=590380418301  
+
+* about us:
+
+  http://www.vetopo.com
+
 ## Downdload: 
 
 * git clone --recursive https://github.com/vetopo/ESP8266_RTOS_WORKSPACE.git 
